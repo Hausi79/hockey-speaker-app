@@ -318,6 +318,35 @@ input {
   border: 2px dashed #444;
 }
 
+.situation-button__reorder {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.situation-button__reorder-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.35);
+  font-size: 0.7rem;
+}
+
+.situation-button__reorder-btn:active {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.situation-button__reorder-btn--disabled {
+  opacity: 0.25;
+  pointer-events: none;
+}
+
 /* --- Soundboard --- */
 
 .soundboard {

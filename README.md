@@ -118,7 +118,9 @@ Repository-Namen muss dieser Pfad entsprechend angepasst werden.
    die laufende Musik jederzeit sofort stoppen (z. B. wenn vergessen
    wurde, sie beim Spielstart zu pausieren) – danach kann über die
    Situationsbuttons wieder normal gestartet werden.
-3. **Situationsbuttons**: Über "Buttons bearbeiten" jedem Button einen
+3. **Situationsbuttons**: Im Bearbeiten-Modus lässt sich die
+   Reihenfolge der Buttons über die ▲▼-Pfeile an jedem Button anpassen.
+   Ausserdem jedem Button einen
    Namen, eine Farbe, einen **Typ** sowie einen Spotify-Link zuweisen:
    - **🎵 Einzeltitel**: spielt immer denselben Song (z. B. Tor,
      Gegentor, Strafe, Strafe Gegner, Sieg, Spielende).

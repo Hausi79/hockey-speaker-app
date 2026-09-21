@@ -7,6 +7,7 @@ interface SituationButtonsProps {
   onTrigger: (button: SituationButtonConfig) => void;
   onEdit: (button: SituationButtonConfig) => void;
   onAdd: () => void;
+  onMove: (id: string, direction: 'up' | 'down') => void;
   triggeringId: string | null;
 }
 
@@ -16,13 +17,14 @@ export function SituationButtons({
   onTrigger,
   onEdit,
   onAdd,
+  onMove,
   triggeringId,
 }: SituationButtonsProps) {
   const [pending, setPending] = useState<string | null>(null);
 
   return (
     <div className="situation-grid">
-      {buttons.map((button) => {
+      {buttons.map((button, index) => {
         const isUnconfigured = !button.spotifyUri;
         return (
           <button
@@ -52,6 +54,32 @@ export function SituationButtons({
               <span className="situation-button__badge">Nicht konfiguriert</span>
             )}
             {pending === button.id && <span className="situation-button__pulse" />}
+            {editMode && (
+              <span className="situation-button__reorder">
+                <span
+                  role="button"
+                  aria-label="Nach oben verschieben"
+                  className={`situation-button__reorder-btn ${index === 0 ? 'situation-button__reorder-btn--disabled' : ''}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (index > 0) onMove(button.id, 'up');
+                  }}
+                >
+                  ▲
+                </span>
+                <span
+                  role="button"
+                  aria-label="Nach unten verschieben"
+                  className={`situation-button__reorder-btn ${index === buttons.length - 1 ? 'situation-button__reorder-btn--disabled' : ''}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (index < buttons.length - 1) onMove(button.id, 'down');
+                  }}
+                >
+                  ▼
+                </span>
+              </span>
+            )}
           </button>
         );
       })}

@@ -79,6 +79,14 @@ export async function saveSituationButton(button: SituationButtonConfig): Promis
   await db.put('situationButtons', button);
 }
 
+/** Persists a full set of buttons at once, used when reordering. */
+export async function saveSituationButtons(buttons: SituationButtonConfig[]): Promise<void> {
+  const db = await getDb();
+  const tx = db.transaction('situationButtons', 'readwrite');
+  await Promise.all(buttons.map((b) => tx.store.put(b)));
+  await tx.done;
+}
+
 export async function createSituationButton(
   data: Omit<SituationButtonConfig, 'id'>,
 ): Promise<SituationButtonConfig> {

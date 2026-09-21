@@ -9,6 +9,7 @@ import {
   resetAllPlaylistProgress,
   resetTrackProgress,
   saveSituationButton,
+  saveSituationButtons,
 } from './storage/db';
 import type { SituationButtonConfig } from './storage/types';
 import * as spotify from './spotify/api';
@@ -127,6 +128,28 @@ export default function App() {
     setEditingButton(draft);
   }, [buttons.length]);
 
+  const handleMoveButton = useCallback(
+    async (id: string, direction: 'up' | 'down') => {
+      setButtons((current) => {
+        const sorted = [...current].sort((a, b) => a.order - b.order);
+        const index = sorted.findIndex((b) => b.id === id);
+        const swapWith = direction === 'up' ? index - 1 : index + 1;
+        if (index === -1 || swapWith < 0 || swapWith >= sorted.length) return current;
+
+        const a = sorted[index];
+        const b = sorted[swapWith];
+        const updatedA = { ...a, order: b.order };
+        const updatedB = { ...b, order: a.order };
+        sorted[index] = updatedB;
+        sorted[swapWith] = updatedA;
+
+        saveSituationButtons([updatedA, updatedB]);
+        return sorted;
+      });
+    },
+    [],
+  );
+
   const handlePlayPause = useCallback(async () => {
     if (!playbackState.playback) return;
     try {
@@ -218,6 +241,7 @@ export default function App() {
           onTrigger={handleTrigger}
           onEdit={setEditingButton}
           onAdd={handleAddButton}
+          onMove={handleMoveButton}
           triggeringId={triggeringId}
         />
       </section>
