@@ -28,31 +28,35 @@ export function NowPlaying({ playback, onStop }: NowPlayingProps) {
 
   return (
     <div className="now-playing">
-      {track.albumArt && (
-        <img className="now-playing__cover" src={track.albumArt} alt="" />
-      )}
-      <div className="now-playing__info">
-        <div className="now-playing__title">{track.name}</div>
-        <div className="now-playing__artist">{track.artists}</div>
-        <div className="now-playing__progress-track">
-          <div
-            className="now-playing__progress-fill"
-            style={{ width: `${progressPercent}%` }}
-          />
-        </div>
-        <div className="now-playing__time">
-          {formatMs(progressMs)} / {formatMs(track.durationMs)}{' '}
-          {isPlaying ? '▶' : '⏸'}
+      <div className="now-playing__row">
+        {track.albumArt && (
+          <img className="now-playing__cover" src={track.albumArt} alt="" />
+        )}
+        <div className="now-playing__info">
+          <div className="now-playing__title">{track.name}</div>
+          <div className="now-playing__artist">{track.artists}</div>
+          <div className="now-playing__progress-track">
+            <div
+              className="now-playing__progress-fill"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+          <div className="now-playing__time">
+            {formatMs(progressMs)} / {formatMs(track.durationMs)}{' '}
+            {isPlaying ? '▶' : '⏸'}
+          </div>
         </div>
       </div>
-      <button
-        className="btn-stop"
-        onClick={onStop}
-        aria-label="Musik stoppen"
-        title="Musik stoppen"
-      >
-        ⏹ Musik aus
-      </button>
+      {isPlaying && (
+        <button
+          className="btn-stop"
+          onClick={onStop}
+          aria-label="Musik stoppen"
+          title="Musik stoppen"
+        >
+          ⏹ Musik aus
+        </button>
+      )}
     </div>
   );
 }

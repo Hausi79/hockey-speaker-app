@@ -126,16 +126,23 @@ input {
 
 .now-playing {
   display: flex;
-  gap: 14px;
+  flex-direction: column;
+  gap: 12px;
   background: var(--surface);
   border-radius: var(--radius);
   padding: 14px;
-  align-items: center;
 }
 
 .now-playing--empty {
   color: var(--text-muted);
   justify-content: center;
+  align-items: center;
+}
+
+.now-playing__row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
 }
 
 .now-playing__cover {
@@ -187,20 +194,25 @@ input {
 }
 
 .btn-stop {
-  flex-shrink: 0;
+  width: 100%;
   background: var(--danger, #ff4d4f);
   color: #fff;
   border: none;
   border-radius: var(--radius);
-  padding: 10px 14px;
-  font-weight: 700;
-  font-size: 0.9rem;
+  padding: 20px;
+  font-weight: 800;
+  font-size: 1.4rem;
   cursor: pointer;
   white-space: nowrap;
+  box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.4);
 }
 
 .btn-stop:hover {
   filter: brightness(1.1);
+}
+
+.btn-stop:active {
+  transform: scale(0.98);
 }
 
 /* --- Playback controls --- */
