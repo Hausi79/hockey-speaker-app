@@ -3,11 +3,20 @@ import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
-export default defineConfig({
-  // GitHub Pages serves this repo under /hockey-speaker-app/, so all
-  // asset URLs need that prefix. Locally (`npm run dev`/`vite preview`)
-  // Vite still serves from `/`, this only affects the production build.
-  base: '/hockey-speaker-app/',
+export default defineConfig(({ command }) => ({
+  // GitHub Pages serves the production build under
+  // /hockey-speaker-app/, so built asset URLs need that prefix. The
+  // dev server (`npm run dev`) must stay at `/` so it keeps matching
+  // the local Spotify redirect URI (http://127.0.0.1:5173/).
+  base: command === 'build' ? '/hockey-speaker-app/' : '/',
+  // Bind explicitly to the IPv4 loopback: on some macOS setups Vite's
+  // default `localhost` binding resolves to IPv6-only ([::1]), which
+  // the browser can't reach via 127.0.0.1 (needed to match the
+  // registered Spotify redirect URI).
+  server: {
+    host: '127.0.0.1',
+    port: 5173,
+  },
   plugins: [
     react(),
     VitePWA({
@@ -53,4 +62,4 @@ export default defineConfig({
       },
     }),
   ],
-})
+}))

@@ -393,6 +393,10 @@ input {
   color: var(--text-muted);
 }
 
+.modal__hint--error {
+  color: var(--danger);
+}
+
 .color-presets {
   display: flex;
   gap: 8px;

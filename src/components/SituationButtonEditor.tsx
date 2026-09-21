@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { SituationButtonConfig, SituationButtonMode } from '../storage/types';
+import { getSpotifyUriType, normalizeSpotifyUri } from '../spotify/uri';
 
 interface SituationButtonEditorProps {
   button: SituationButtonConfig;
@@ -27,7 +28,7 @@ export function SituationButtonEditor({
 }: SituationButtonEditorProps) {
   const [label, setLabel] = useState(button.label);
   const [mode, setMode] = useState<SituationButtonMode>(button.mode);
-  const [spotifyUri, setSpotifyUri] = useState(button.spotifyUri);
+  const [spotifyInput, setSpotifyInput] = useState(button.spotifyUri);
   const [startSeconds, setStartSeconds] = useState(
     Math.round(button.startPositionMs / 1000),
   );
@@ -36,10 +37,17 @@ export function SituationButtonEditor({
   useEffect(() => {
     setLabel(button.label);
     setMode(button.mode);
-    setSpotifyUri(button.spotifyUri);
+    setSpotifyInput(button.spotifyUri);
     setStartSeconds(Math.round(button.startPositionMs / 1000));
     setColor(button.color);
   }, [button]);
+
+  const normalizedUri = normalizeSpotifyUri(spotifyInput);
+  const detectedType = normalizedUri ? getSpotifyUriType(normalizedUri) : 'unknown';
+  const expectedType = mode === 'track' ? 'track' : 'playlist';
+  const isUriInvalid = spotifyInput.trim().length > 0 && !normalizedUri;
+  const isTypeMismatch =
+    normalizedUri !== null && detectedType !== 'unknown' && detectedType !== expectedType;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -75,16 +83,33 @@ export function SituationButtonEditor({
         </p>
 
         <label>
-          {mode === 'track' ? 'Spotify Track-URI' : 'Spotify Playlist-URI'}
+          {mode === 'track' ? 'Spotify-Track-Link oder -URI' : 'Spotify-Playlist-Link oder -URI'}
           <input
-            placeholder={mode === 'track' ? 'spotify:track:...' : 'spotify:playlist:...'}
-            value={spotifyUri}
-            onChange={(e) => setSpotifyUri(e.target.value)}
+            placeholder={
+              mode === 'track'
+                ? 'https://open.spotify.com/track/... oder spotify:track:...'
+                : 'https://open.spotify.com/playlist/... oder spotify:playlist:...'
+            }
+            value={spotifyInput}
+            onChange={(e) => setSpotifyInput(e.target.value)}
           />
         </label>
         <p className="modal__hint">
-          Die URI findest du in Spotify über „Teilen&nbsp;→&nbsp;Spotify-URI kopieren“.
+          Einfach den normalen „Link kopieren“ aus Spotify (Teilen) einfügen –
+          die App wandelt ihn automatisch in die richtige URI um.
         </p>
+        {isUriInvalid && (
+          <p className="modal__hint modal__hint--error">
+            Das sieht nicht nach einem gültigen Spotify-Link/URI aus.
+          </p>
+        )}
+        {isTypeMismatch && (
+          <p className="modal__hint modal__hint--error">
+            Das ist ein {detectedType === 'track' ? 'Einzeltitel' : 'Playlist'}-Link,
+            der Button ist aber auf „{expectedType === 'track' ? 'Einzeltitel' : 'Playlist'}“
+            eingestellt. Bitte Typ oben anpassen oder passenden Link einfügen.
+          </p>
+        )}
 
         <label>
           Startpunkt (Sekunden ab Songbeginn)
@@ -119,12 +144,13 @@ export function SituationButtonEditor({
             </button>
             <button
               className="btn-primary"
+              disabled={isUriInvalid || isTypeMismatch}
               onClick={() =>
                 onSave({
                   ...button,
                   label: label.trim() || button.label,
                   mode,
-                  spotifyUri: spotifyUri.trim(),
+                  spotifyUri: normalizedUri ?? '',
                   startPositionMs: Math.max(0, startSeconds) * 1000,
                   color,
                 })

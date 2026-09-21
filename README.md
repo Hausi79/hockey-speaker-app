@@ -115,14 +115,20 @@ Repository-Namen muss dieser Pfad entsprechend angepasst werden.
    muss die Spotify-App aktiv/geöffnet sein, damit ein "aktives Gerät"
    existiert – sonst erscheint ein entsprechender Hinweis.
 3. **Situationsbuttons**: Über "Buttons bearbeiten" jedem Button einen
-   Namen, eine Farbe, einen **Typ** sowie eine Spotify-URI zuweisen:
+   Namen, eine Farbe, einen **Typ** sowie einen Spotify-Link zuweisen:
    - **🎵 Einzeltitel**: spielt immer denselben Song (z. B. Tor,
-     Gegentor, Strafe, Strafe Gegner, Sieg, Spielende). URI-Format:
-     `spotify:track:...`.
+     Gegentor, Strafe, Strafe Gegner, Sieg, Spielende).
    - **📃 Playlist**: wählt bei jedem Tap zufällig einen noch nicht
      gespielten Titel aus der Playlist (z. B. Einlaufen, Pause,
      Spielunterbruch), damit sich Songs innerhalb eines Spiels nicht
-     wiederholen. URI-Format: `spotify:playlist:...`.
+     wiederholen.
+
+   Für die URI reicht der normale **"Link kopieren"** aus dem
+   Spotify-Teilen-Menü (z. B. `https://open.spotify.com/track/...`
+   oder `.../playlist/...`) – die App erkennt und normalisiert ihn
+   automatisch. Klassische `spotify:track:...`/`spotify:playlist:...`
+   URIs funktionieren weiterhin ebenfalls.
+
    Zusätzlich ein Startpunkt in Sekunden (z. B. Intro von 15s
    überspringen). Ein Tap im Normalmodus startet sofort den
    zugeordneten bzw. ausgewählten Song an der konfigurierten Position.
