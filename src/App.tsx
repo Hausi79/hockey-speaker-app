@@ -140,6 +140,17 @@ export default function App() {
     }
   }, [playbackState]);
 
+  const handleStop = useCallback(async () => {
+    setActionError(null);
+    if (!playbackState.playback?.isPlaying) return;
+    try {
+      await spotify.pause();
+      await playbackState.refresh();
+    } catch (err) {
+      setActionError(err instanceof SpotifyApiError ? err.message : 'Musik konnte nicht gestoppt werden.');
+    }
+  }, [playbackState]);
+
   if (auth.status === 'checking') {
     return (
       <div className="app-shell app-shell--center">
@@ -187,7 +198,7 @@ export default function App() {
       )}
       {actionError && <ErrorBanner message={actionError} />}
 
-      <NowPlaying playback={playbackState.playback} />
+      <NowPlaying playback={playbackState.playback} onStop={handleStop} />
 
       <PlaybackControls
         isPlaying={playbackState.playback?.isPlaying ?? false}

@@ -186,6 +186,23 @@ input {
   color: var(--text-muted);
 }
 
+.btn-stop {
+  flex-shrink: 0;
+  background: var(--danger, #ff4d4f);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-stop:hover {
+  filter: brightness(1.1);
+}
+
 /* --- Playback controls --- */
 
 .playback-controls {

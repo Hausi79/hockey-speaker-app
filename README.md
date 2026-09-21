@@ -113,7 +113,11 @@ Repository-Namen muss dieser Pfad entsprechend angepasst werden.
    wird angezeigt, inkl. Play/Pause, Skip vor/zurück, Lautstärke.
    Voraussetzung: Auf irgendeinem Gerät (Handy, Lautsprecher, Desktop)
    muss die Spotify-App aktiv/geöffnet sein, damit ein "aktives Gerät"
-   existiert – sonst erscheint ein entsprechender Hinweis.
+   existiert – sonst erscheint ein entsprechender Hinweis. Über den
+   **"⏹ Musik aus"**-Button direkt neben der Titelanzeige lässt sich
+   die laufende Musik jederzeit sofort stoppen (z. B. wenn vergessen
+   wurde, sie beim Spielstart zu pausieren) – danach kann über die
+   Situationsbuttons wieder normal gestartet werden.
 3. **Situationsbuttons**: Über "Buttons bearbeiten" jedem Button einen
    Namen, eine Farbe, einen **Typ** sowie einen Spotify-Link zuweisen:
    - **🎵 Einzeltitel**: spielt immer denselben Song (z. B. Tor,

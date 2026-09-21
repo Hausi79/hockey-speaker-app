@@ -2,6 +2,7 @@ import type { PlaybackState } from '../spotify/types';
 
 interface NowPlayingProps {
   playback: PlaybackState | null;
+  onStop: () => void;
 }
 
 function formatMs(ms: number): string {
@@ -11,7 +12,7 @@ function formatMs(ms: number): string {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
-export function NowPlaying({ playback }: NowPlayingProps) {
+export function NowPlaying({ playback, onStop }: NowPlayingProps) {
   if (!playback || !playback.track) {
     return (
       <div className="now-playing now-playing--empty">
@@ -44,6 +45,14 @@ export function NowPlaying({ playback }: NowPlayingProps) {
           {isPlaying ? '▶' : '⏸'}
         </div>
       </div>
+      <button
+        className="btn-stop"
+        onClick={onStop}
+        aria-label="Musik stoppen"
+        title="Musik stoppen"
+      >
+        ⏹ Musik aus
+      </button>
     </div>
   );
 }
