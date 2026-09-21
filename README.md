@@ -115,15 +115,24 @@ Repository-Namen muss dieser Pfad entsprechend angepasst werden.
    muss die Spotify-App aktiv/geöffnet sein, damit ein "aktives Gerät"
    existiert – sonst erscheint ein entsprechender Hinweis.
 3. **Situationsbuttons**: Über "Buttons bearbeiten" jedem Button einen
-   Namen, eine Farbe, eine Spotify-Track-/Playlist-URI (via
-   Spotify-App: "Teilen → Spotify-URI kopieren") sowie einen
-   Startpunkt in Sekunden zuweisen (z. B. Intro von 15s überspringen).
-   Ein Tap im Normalmodus startet sofort den zugeordneten Song an der
-   konfigurierten Position.
-4. **Lokale Sounds**: Buzzer/Jingles als Audiodatei hochladen – diese
+   Namen, eine Farbe, einen **Typ** sowie eine Spotify-URI zuweisen:
+   - **🎵 Einzeltitel**: spielt immer denselben Song (z. B. Tor,
+     Gegentor, Strafe, Strafe Gegner, Sieg, Spielende). URI-Format:
+     `spotify:track:...`.
+   - **📃 Playlist**: wählt bei jedem Tap zufällig einen noch nicht
+     gespielten Titel aus der Playlist (z. B. Einlaufen, Pause,
+     Spielunterbruch), damit sich Songs innerhalb eines Spiels nicht
+     wiederholen. URI-Format: `spotify:playlist:...`.
+   Zusätzlich ein Startpunkt in Sekunden (z. B. Intro von 15s
+   überspringen). Ein Tap im Normalmodus startet sofort den
+   zugeordneten bzw. ausgewählten Song an der konfigurierten Position.
+4. **Neues Spiel**: Der Button "🆕 Neues Spiel" im Header setzt den
+   "bereits gespielt"-Verlauf aller Playlist-Buttons zurück, damit zu
+   Beginn des nächsten Spiels wieder alle Titel zur Auswahl stehen.
+5. **Lokale Sounds**: Buzzer/Jingles als Audiodatei hochladen – diese
    werden lokal (IndexedDB) gespeichert und laufen komplett offline,
    unabhängig vom Spotify-Login.
-5. **Installation**: Beim ersten Besuch erscheint ein Hinweis, die App
+6. **Installation**: Beim ersten Besuch erscheint ein Hinweis, die App
    "Zum Home-Bildschirm" hinzuzufügen (iOS: Teilen → Zum
    Home-Bildschirm; Android/Chrome: Installieren-Button oder
    Browsermenü).
@@ -152,7 +161,9 @@ Repository-Namen muss dieser Pfad entsprechend angepasst werden.
 - Playback-Status wird per Polling (alle 3s) abgefragt (kein
   Web-Playback-SDK/Streaming im Browser integriert).
 - Situationsbuttons akzeptieren Track- oder Playlist-URIs im Format
-  `spotify:track:...` bzw. `spotify:playlist:...`.
+  `spotify:track:...` bzw. `spotify:playlist:...`. Bei Playlist-Buttons
+  wird der "bereits gespielt"-Verlauf lokal (IndexedDB) pro Button
+  gespeichert; "Neues Spiel" setzt ihn zurück.
 - Es wird kein eigenes Spotify-Gerät im Browser erzeugt – es muss ein
   vorhandenes aktives Gerät (Handy/Lautsprecher/Desktop-App) verwendet
   werden.

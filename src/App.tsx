@@ -3,7 +3,11 @@ import { useSpotifyAuth } from './hooks/useSpotifyAuth';
 import { usePlaybackState } from './hooks/usePlaybackState';
 import {
   deleteSituationButton,
+  getPlayedTrackUris,
   getSituationButtons,
+  markTrackAsPlayed,
+  resetAllPlaylistProgress,
+  resetTrackProgress,
   saveSituationButton,
 } from './storage/db';
 import type { SituationButtonConfig } from './storage/types';
@@ -35,12 +39,48 @@ export default function App() {
     }
   }, [auth.status]);
 
+  /**
+   * Picks a random track from the button's playlist that hasn't been
+   * played yet this game. Once every track has been played, the
+   * history is cleared (keeping only the last played track, to avoid
+   * an immediate repeat) and playback continues from a fresh shuffle.
+   */
+  const playRandomFromPlaylist = useCallback(
+    async (button: SituationButtonConfig) => {
+      const allTrackUris = await spotify.getPlaylistTrackUris(button.spotifyUri);
+      if (allTrackUris.length === 0) {
+        throw new SpotifyApiError('Die Playlist enthält keine Titel.', undefined, 'UNKNOWN');
+      }
+
+      const played = await getPlayedTrackUris(button.id);
+      let candidates = allTrackUris.filter((uri) => !played.includes(uri));
+
+      if (candidates.length === 0) {
+        // All tracks played: reshuffle, but avoid repeating the very
+        // last played track immediately if there are alternatives.
+        const lastPlayed = played[played.length - 1];
+        candidates = allTrackUris.filter((uri) => uri !== lastPlayed);
+        if (candidates.length === 0) candidates = allTrackUris;
+        await resetTrackProgress(button.id, lastPlayed ? [lastPlayed] : []);
+      }
+
+      const pick = candidates[Math.floor(Math.random() * candidates.length)];
+      await spotify.playUriAtPosition(pick, button.startPositionMs);
+      await markTrackAsPlayed(button.id, pick);
+    },
+    [],
+  );
+
   const handleTrigger = useCallback(
     async (button: SituationButtonConfig) => {
       setActionError(null);
       setTriggeringId(button.id);
       try {
-        await spotify.playUriAtPosition(button.spotifyUri, button.startPositionMs);
+        if (button.mode === 'playlist') {
+          await playRandomFromPlaylist(button);
+        } else {
+          await spotify.playUriAtPosition(button.spotifyUri, button.startPositionMs);
+        }
       } catch (err) {
         setActionError(
           err instanceof SpotifyApiError
@@ -51,8 +91,15 @@ export default function App() {
         setTriggeringId(null);
       }
     },
-    [],
+    [playRandomFromPlaylist],
   );
+
+  const handleNewGame = useCallback(async () => {
+    if (!window.confirm('Neues Spiel starten? Der "bereits gespielt"-Verlauf aller Playlist-Buttons wird zurückgesetzt.')) {
+      return;
+    }
+    await resetAllPlaylistProgress();
+  }, []);
 
   const handleSaveButton = useCallback(async (button: SituationButtonConfig) => {
     await saveSituationButton(button);
@@ -72,6 +119,7 @@ export default function App() {
       order: buttons.length,
       label: 'Neuer Button',
       color: '#6b7280',
+      mode: 'track',
       spotifyUri: '',
       startPositionMs: 0,
     };
@@ -115,6 +163,9 @@ export default function App() {
       <header className="app-header">
         <h1>🏒 Stadion-Speaker</h1>
         <div className="app-header__actions">
+          <button className="btn-secondary" onClick={handleNewGame}>
+            🆕 Neues Spiel
+          </button>
           <button
             className={`btn-secondary ${editMode ? 'btn-secondary--active' : ''}`}
             onClick={() => setEditMode((v) => !v)}

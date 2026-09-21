@@ -399,6 +399,27 @@ input {
   flex-wrap: wrap;
 }
 
+.mode-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.mode-toggle__option {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: 2px solid transparent;
+}
+
+.mode-toggle__option--selected {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
 .color-swatch {
   width: 32px;
   height: 32px;

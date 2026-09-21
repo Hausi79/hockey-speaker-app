@@ -1,6 +1,8 @@
 // Local configuration types. Everything here is persisted client-side
 // only (IndexedDB) - no server, no cloud sync.
 
+export type SituationButtonMode = 'track' | 'playlist';
+
 export interface SituationButtonConfig {
   id: string;
   /** Order of appearance in the grid. */
@@ -8,10 +10,28 @@ export interface SituationButtonConfig {
   label: string;
   /** Hex color for the button background, for quick visual distinction. */
   color: string;
-  /** Spotify track or playlist URI, e.g. spotify:track:xxxx */
+  /**
+   * 'track': always plays the exact same song (e.g. Tor, Gegentor,
+   * Strafe). 'playlist': picks a random not-yet-played song from the
+   * playlist each time (e.g. Einlaufen, Pause, Spielunterbruch), so the
+   * same song doesn't repeat within a game.
+   */
+  mode: SituationButtonMode;
+  /** Spotify track or playlist URI, e.g. spotify:track:xxxx / spotify:playlist:xxxx */
   spotifyUri: string;
   /** Where playback should start, in milliseconds (skips intros etc.). */
   startPositionMs: number;
+}
+
+/**
+ * Tracks which songs of a playlist-mode button have already been
+ * played during the current game, so they aren't repeated. Reset via
+ * the "Neues Spiel" action.
+ */
+export interface PlaylistProgress {
+  /** Same id as the SituationButtonConfig it belongs to. */
+  buttonId: string;
+  playedTrackUris: string[];
 }
 
 export interface LocalSound {
@@ -26,10 +46,13 @@ export interface LocalSound {
 }
 
 export const DEFAULT_SITUATION_BUTTONS: Omit<SituationButtonConfig, 'id'>[] = [
-  { order: 0, label: 'Anpfiff', color: '#1db954', spotifyUri: '', startPositionMs: 0 },
-  { order: 1, label: 'Tor', color: '#ff4d4f', spotifyUri: '', startPositionMs: 0 },
-  { order: 2, label: 'Pause', color: '#3b82f6', spotifyUri: '', startPositionMs: 0 },
-  { order: 3, label: 'Timeout', color: '#f59e0b', spotifyUri: '', startPositionMs: 0 },
-  { order: 4, label: 'Penalty', color: '#a855f7', spotifyUri: '', startPositionMs: 0 },
-  { order: 5, label: 'Sieg', color: '#ec4899', spotifyUri: '', startPositionMs: 0 },
+  { order: 0, label: 'Einlaufen', color: '#1db954', mode: 'playlist', spotifyUri: '', startPositionMs: 0 },
+  { order: 1, label: 'Tor', color: '#ff4d4f', mode: 'track', spotifyUri: '', startPositionMs: 0 },
+  { order: 2, label: 'Gegentor', color: '#7f1d1d', mode: 'track', spotifyUri: '', startPositionMs: 0 },
+  { order: 3, label: 'Pause', color: '#3b82f6', mode: 'playlist', spotifyUri: '', startPositionMs: 0 },
+  { order: 4, label: 'Spielunterbruch', color: '#0ea5e9', mode: 'playlist', spotifyUri: '', startPositionMs: 0 },
+  { order: 5, label: 'Strafe', color: '#a855f7', mode: 'track', spotifyUri: '', startPositionMs: 0 },
+  { order: 6, label: 'Strafe Gegner', color: '#6b21a8', mode: 'track', spotifyUri: '', startPositionMs: 0 },
+  { order: 7, label: 'Sieg', color: '#ec4899', mode: 'track', spotifyUri: '', startPositionMs: 0 },
+  { order: 8, label: 'Spielende', color: '#f59e0b', mode: 'track', spotifyUri: '', startPositionMs: 0 },
 ];

@@ -15,6 +15,8 @@ const SCOPES = [
   'user-read-playback-state',
   'user-modify-playback-state',
   'user-read-currently-playing',
+  'playlist-read-private',
+  'playlist-read-collaborative',
 ].join(' ');
 
 const AUTHORIZE_URL = 'https://accounts.spotify.com/authorize';

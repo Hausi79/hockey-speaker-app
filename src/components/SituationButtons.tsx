@@ -43,7 +43,10 @@ export function SituationButtons({
               setTimeout(() => setPending(null), 400);
             }}
           >
-            <span className="situation-button__label">{button.label}</span>
+            <span className="situation-button__label">
+              {button.mode === 'playlist' ? '📃 ' : ''}
+              {button.label}
+            </span>
             {editMode && <span className="situation-button__badge">✏️ Bearbeiten</span>}
             {!editMode && isUnconfigured && (
               <span className="situation-button__badge">Nicht konfiguriert</span>

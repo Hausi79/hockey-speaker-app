@@ -5,6 +5,7 @@ import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
 import {
   DEFAULT_SITUATION_BUTTONS,
   type LocalSound,
+  type PlaylistProgress,
   type SituationButtonConfig,
 } from './types';
 
@@ -19,22 +20,31 @@ interface HockeySpeakerDB extends DBSchema {
     value: LocalSound;
     indexes: { order: number };
   };
+  playlistProgress: {
+    key: string;
+    value: PlaylistProgress;
+  };
 }
 
 const DB_NAME = 'hockey-speaker-app';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 let dbPromise: Promise<IDBPDatabase<HockeySpeakerDB>> | null = null;
 
 function getDb(): Promise<IDBPDatabase<HockeySpeakerDB>> {
   if (!dbPromise) {
     dbPromise = openDB<HockeySpeakerDB>(DB_NAME, DB_VERSION, {
-      upgrade(db) {
-        const buttons = db.createObjectStore('situationButtons', { keyPath: 'id' });
-        buttons.createIndex('order', 'order');
+      upgrade(db, oldVersion) {
+        if (oldVersion < 1) {
+          const buttons = db.createObjectStore('situationButtons', { keyPath: 'id' });
+          buttons.createIndex('order', 'order');
 
-        const sounds = db.createObjectStore('localSounds', { keyPath: 'id' });
-        sounds.createIndex('order', 'order');
+          const sounds = db.createObjectStore('localSounds', { keyPath: 'id' });
+          sounds.createIndex('order', 'order');
+        }
+        if (oldVersion < 2) {
+          db.createObjectStore('playlistProgress', { keyPath: 'buttonId' });
+        }
       },
     });
   }
@@ -110,4 +120,30 @@ export async function addLocalSound(
 export async function deleteLocalSound(id: string): Promise<void> {
   const db = await getDb();
   await db.delete('localSounds', id);
+}
+
+// --- Playlist progress (per-game "already played" tracking) ------------
+
+export async function getPlayedTrackUris(buttonId: string): Promise<string[]> {
+  const db = await getDb();
+  const progress = await db.get('playlistProgress', buttonId);
+  return progress?.playedTrackUris ?? [];
+}
+
+export async function markTrackAsPlayed(buttonId: string, trackUri: string): Promise<void> {
+  const db = await getDb();
+  const existing = await db.get('playlistProgress', buttonId);
+  const playedTrackUris = existing ? [...existing.playedTrackUris, trackUri] : [trackUri];
+  await db.put('playlistProgress', { buttonId, playedTrackUris });
+}
+
+export async function resetTrackProgress(buttonId: string, keepUris: string[] = []): Promise<void> {
+  const db = await getDb();
+  await db.put('playlistProgress', { buttonId, playedTrackUris: keepUris });
+}
+
+/** Clears the "already played" history for all playlist buttons ("Neues Spiel"). */
+export async function resetAllPlaylistProgress(): Promise<void> {
+  const db = await getDb();
+  await db.clear('playlistProgress');
 }

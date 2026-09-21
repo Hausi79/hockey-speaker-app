@@ -193,3 +193,31 @@ export async function playUriAtPosition(
       : { contextUri: uri, positionMs },
   );
 }
+
+/**
+ * Fetches all track URIs contained in a playlist (paginated, 100 per
+ * page), used to pick a random not-yet-played track for playlist-mode
+ * situation buttons.
+ */
+export async function getPlaylistTrackUris(playlistUri: string): Promise<string[]> {
+  const playlistId = playlistUri.split(':').pop();
+  if (!playlistId) {
+    throw new SpotifyApiError('Ungültige Playlist-URI.', undefined, 'UNKNOWN');
+  }
+
+  const uris: string[] = [];
+  let path: string | null =
+    `/playlists/${playlistId}/tracks?fields=items(track(uri)),next&limit=100`;
+
+  while (path) {
+    const res = await authorizedFetch(path);
+    const json = await res.json();
+    for (const item of json.items ?? []) {
+      if (item?.track?.uri) uris.push(item.track.uri);
+    }
+    // `next` is a full URL from Spotify; strip the API base to reuse authorizedFetch.
+    path = json.next ? (json.next as string).replace(API_BASE, '') : null;
+  }
+
+  return uris;
+}
