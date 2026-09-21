@@ -57,14 +57,16 @@ async function authorizedFetch(
 
   if (!res.ok) {
     let detail = '';
+    let reason = '';
     try {
       const body = await res.json();
       detail = body?.error?.message ?? '';
+      reason = body?.error?.reason ?? '';
     } catch {
       /* ignore body parse errors */
     }
     throw new SpotifyApiError(
-      `Spotify-API-Fehler (${res.status})${detail ? `: ${detail}` : ''}`,
+      `Spotify-API-Fehler (${res.status})${detail ? `: ${detail}` : ''}${reason ? ` [reason: ${reason}]` : ''}`,
       res.status,
       'UNKNOWN',
     );
@@ -134,16 +136,59 @@ export async function getDevices(): Promise<SpotifyDevice[]> {
   return json.devices ?? [];
 }
 
+/**
+ * Resolves which device a play command should target. Spotify can
+ * reject player commands with a vague 403 "Restriction violated" when
+ * no explicit device_id is sent and multiple devices are available
+ * (e.g. Mac + phone both have Spotify open) - so we always resolve
+ * and pass an explicit device_id instead of relying on the implicit
+ * "currently active device".
+ */
+async function resolveTargetDeviceId(): Promise<string> {
+  const devices = await getDevices();
+  if (devices.length === 0) {
+    throw new SpotifyApiError(
+      'Kein Spotify-Gerät gefunden. Bitte Spotify auf einem Gerät öffnen.',
+      404,
+      'NO_ACTIVE_DEVICE',
+    );
+  }
+  const active = devices.find((d) => d.is_active);
+  return (active ?? devices[0]).id;
+}
+
+/**
+ * Explicitly transfers playback to a device before issuing play
+ * commands. Spotify Connect commands can otherwise fail with a vague
+ * 403 "Restriction violated" if the target device isn't cleanly
+ * marked active yet (a known Spotify Web API quirk, especially with
+ * the macOS desktop app).
+ */
+async function transferPlaybackTo(deviceId: string): Promise<void> {
+  await authorizedFetch('/me/player', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ device_ids: [deviceId], play: false }),
+  });
+  // Give Spotify Connect a brief moment to complete the transfer
+  // before sending the actual play command.
+  await new Promise((resolve) => setTimeout(resolve, 300));
+}
+
 export async function play(options?: {
   uris?: string[];
   contextUri?: string;
+  offsetUri?: string;
   positionMs?: number;
   deviceId?: string;
 }): Promise<void> {
-  const query = options?.deviceId ? `?device_id=${options.deviceId}` : '';
+  const deviceId = options?.deviceId ?? (await resolveTargetDeviceId());
+  await transferPlaybackTo(deviceId);
+  const query = `?device_id=${deviceId}`;
   const body: Record<string, unknown> = {};
   if (options?.uris) body.uris = options.uris;
   if (options?.contextUri) body.context_uri = options.contextUri;
+  if (options?.offsetUri) body.offset = { uri: options.offsetUri };
   if (options?.positionMs !== undefined) body.position_ms = options.positionMs;
 
   await authorizedFetch(`/me/player/play${query}`, {
@@ -151,6 +196,21 @@ export async function play(options?: {
     headers: { 'Content-Type': 'application/json' },
     body: Object.keys(body).length ? JSON.stringify(body) : undefined,
   });
+}
+
+/**
+ * Fetches the album URI a track belongs to. Used as a workaround for
+ * playing single tracks (see playUriAtPosition below).
+ */
+async function getTrackAlbumUri(trackUri: string): Promise<string> {
+  const trackId = trackUri.split(':').pop();
+  const res = await authorizedFetch(`/tracks/${trackId}`);
+  const data = (await res.json()) as { album?: { uri?: string } };
+  const albumUri = data.album?.uri;
+  if (!albumUri) {
+    throw new SpotifyApiError('Konnte Album des Titels nicht ermitteln.', 500, 'UNKNOWN');
+  }
+  return albumUri;
 }
 
 export async function pause(): Promise<void> {
@@ -181,17 +241,29 @@ export async function setVolume(percent: number): Promise<void> {
 /**
  * Plays a track/playlist URI immediately, starting at the given
  * position. This is the core action behind a "Situationsbutton".
+ * Always resolves and sends an explicit device_id (see
+ * resolveTargetDeviceId) to avoid a vague 403 "Restriction violated"
+ * that Spotify can return when the target device is ambiguous.
+ *
+ * For single tracks, some Spotify Connect clients (observed on the
+ * macOS desktop app) silently fail to start playback when using the
+ * `uris` request field directly, leaving the device with no active
+ * item at all. As a workaround, single tracks are instead played via
+ * their album as `context_uri` with an `offset` pointing at the exact
+ * track - this is reliably accepted by all tested clients.
  */
 export async function playUriAtPosition(
   uri: string,
   positionMs: number,
 ): Promise<void> {
+  const deviceId = await resolveTargetDeviceId();
   const isTrack = uri.includes(':track:');
-  await play(
-    isTrack
-      ? { uris: [uri], positionMs }
-      : { contextUri: uri, positionMs },
-  );
+  if (isTrack) {
+    const albumUri = await getTrackAlbumUri(uri);
+    await play({ contextUri: albumUri, offsetUri: uri, positionMs, deviceId });
+  } else {
+    await play({ contextUri: uri, positionMs, deviceId });
+  }
 }
 
 /**
