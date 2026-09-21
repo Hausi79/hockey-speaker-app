@@ -278,14 +278,17 @@ export async function getPlaylistTrackUris(playlistUri: string): Promise<string[
   }
 
   const uris: string[] = [];
+  // Note: the legacy `/playlists/{id}/tracks` endpoint returns 403
+  // Forbidden for newer Spotify apps; `/items` is its replacement and
+  // uses `item` (not `track`) as the field name for the playlist entry.
   let path: string | null =
-    `/playlists/${playlistId}/tracks?fields=items(track(uri)),next&limit=100`;
+    `/playlists/${playlistId}/items?fields=items(item(uri)),next&limit=100`;
 
   while (path) {
     const res = await authorizedFetch(path);
     const json = await res.json();
-    for (const item of json.items ?? []) {
-      if (item?.track?.uri) uris.push(item.track.uri);
+    for (const entry of json.items ?? []) {
+      if (entry?.item?.uri) uris.push(entry.item.uri);
     }
     // `next` is a full URL from Spotify; strip the API base to reuse authorizedFetch.
     path = json.next ? (json.next as string).replace(API_BASE, '') : null;
