@@ -134,8 +134,12 @@ Repository-Namen muss dieser Pfad entsprechend angepasst werden.
    URIs funktionieren weiterhin ebenfalls.
 
    Zusätzlich ein Startpunkt in Sekunden (z. B. Intro von 15s
-   überspringen). Ein Tap im Normalmodus startet sofort den
-   zugeordneten bzw. ausgewählten Song an der konfigurierten Position.
+   überspringen). Bei **Einzeltitel** ist das ein einzelnes Feld; bei
+   **Playlist** zeigt der Editor alle Songs der Playlist einzeln an,
+   sodass für jeden Titel ein eigener Startpunkt hinterlegt werden
+   kann (unterschiedliche Songs haben ja meist unterschiedlich lange
+   Intros). Ein Tap im Normalmodus startet sofort den zugeordneten
+   bzw. ausgewählten Song an der (für ihn) konfigurierten Position.
 4. **Neues Spiel**: Der Button "🆕 Neues Spiel" im Header setzt den
    "bereits gespielt"-Verlauf aller Playlist-Buttons zurück, damit zu
    Beginn des nächsten Spiels wieder alle Titel zur Auswahl stehen.

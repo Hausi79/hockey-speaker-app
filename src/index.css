@@ -426,6 +426,44 @@ input {
   color: var(--danger);
 }
 
+.track-start-positions__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.track-start-positions__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface-2);
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+
+.track-start-positions__name {
+  flex: 1;
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track-start-positions__row input {
+  width: 64px;
+  flex: none;
+}
+
+.track-start-positions__unit {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
 .color-presets {
   display: flex;
   gap: 8px;

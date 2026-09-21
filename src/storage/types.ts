@@ -19,8 +19,19 @@ export interface SituationButtonConfig {
   mode: SituationButtonMode;
   /** Spotify track or playlist URI, e.g. spotify:track:xxxx / spotify:playlist:xxxx */
   spotifyUri: string;
-  /** Where playback should start, in milliseconds (skips intros etc.). */
+  /**
+   * Where playback should start, in milliseconds (skips intros etc.).
+   * For 'track' mode this is the only start position used. For
+   * 'playlist' mode this is the fallback used when a track has no
+   * entry in trackStartPositions.
+   */
   startPositionMs: number;
+  /**
+   * Playlist mode only: per-track start position overrides, keyed by
+   * Spotify track URI. Lets each song in the playlist skip its own
+   * intro length instead of sharing a single start position.
+   */
+  trackStartPositions?: Record<string, number>;
 }
 
 /**

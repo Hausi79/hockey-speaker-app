@@ -65,7 +65,8 @@ export default function App() {
       }
 
       const pick = candidates[Math.floor(Math.random() * candidates.length)];
-      await spotify.playUriAtPosition(pick, button.startPositionMs);
+      const positionMs = button.trackStartPositions?.[pick] ?? button.startPositionMs;
+      await spotify.playUriAtPosition(pick, positionMs);
       await markTrackAsPlayed(button.id, pick);
     },
     [],

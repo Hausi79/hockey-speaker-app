@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { SituationButtonConfig, SituationButtonMode } from '../storage/types';
 import { getSpotifyUriType, normalizeSpotifyUri } from '../spotify/uri';
+import { getPlaylistTracks, type PlaylistTrackInfo } from '../spotify/api';
 
 interface SituationButtonEditorProps {
   button: SituationButtonConfig;
@@ -33,6 +34,12 @@ export function SituationButtonEditor({
     Math.round(button.startPositionMs / 1000),
   );
   const [color, setColor] = useState(button.color);
+  const [trackStartPositions, setTrackStartPositions] = useState<Record<string, number>>(
+    button.trackStartPositions ?? {},
+  );
+  const [playlistTracks, setPlaylistTracks] = useState<PlaylistTrackInfo[]>([]);
+  const [tracksLoading, setTracksLoading] = useState(false);
+  const [tracksError, setTracksError] = useState<string | null>(null);
 
   useEffect(() => {
     setLabel(button.label);
@@ -40,6 +47,7 @@ export function SituationButtonEditor({
     setSpotifyInput(button.spotifyUri);
     setStartSeconds(Math.round(button.startPositionMs / 1000));
     setColor(button.color);
+    setTrackStartPositions(button.trackStartPositions ?? {});
   }, [button]);
 
   const normalizedUri = normalizeSpotifyUri(spotifyInput);
@@ -48,6 +56,32 @@ export function SituationButtonEditor({
   const isUriInvalid = spotifyInput.trim().length > 0 && !normalizedUri;
   const isTypeMismatch =
     normalizedUri !== null && detectedType !== 'unknown' && detectedType !== expectedType;
+
+  // Load the playlist's tracks so individual start positions can be
+  // configured per song, instead of a single value for the whole
+  // playlist.
+  useEffect(() => {
+    if (mode !== 'playlist' || !normalizedUri || isTypeMismatch) {
+      setPlaylistTracks([]);
+      return;
+    }
+    let cancelled = false;
+    setTracksLoading(true);
+    setTracksError(null);
+    getPlaylistTracks(normalizedUri)
+      .then((tracks) => {
+        if (!cancelled) setPlaylistTracks(tracks);
+      })
+      .catch(() => {
+        if (!cancelled) setTracksError('Titel der Playlist konnten nicht geladen werden.');
+      })
+      .finally(() => {
+        if (!cancelled) setTracksLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [mode, normalizedUri, isTypeMismatch]);
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -111,15 +145,55 @@ export function SituationButtonEditor({
           </p>
         )}
 
-        <label>
-          Startpunkt (Sekunden ab Songbeginn)
-          <input
-            type="number"
-            min={0}
-            value={startSeconds}
-            onChange={(e) => setStartSeconds(Number(e.target.value))}
-          />
-        </label>
+        {mode === 'track' ? (
+          <label>
+            Startpunkt (Sekunden ab Songbeginn)
+            <input
+              type="number"
+              min={0}
+              value={startSeconds}
+              onChange={(e) => setStartSeconds(Number(e.target.value))}
+            />
+          </label>
+        ) : (
+          <div className="track-start-positions">
+            <label>Startpunkte pro Titel (Sekunden ab Songbeginn)</label>
+            {tracksLoading && <p className="modal__hint">Lade Titel der Playlist…</p>}
+            {tracksError && <p className="modal__hint modal__hint--error">{tracksError}</p>}
+            {!tracksLoading && !tracksError && normalizedUri && playlistTracks.length === 0 && (
+              <p className="modal__hint">Die Playlist enthält keine Titel.</p>
+            )}
+            {!tracksLoading && !normalizedUri && (
+              <p className="modal__hint">
+                Erst einen Playlist-Link eingeben, um die Titel einzeln einzustellen.
+              </p>
+            )}
+            {playlistTracks.length > 0 && (
+              <ul className="track-start-positions__list">
+                {playlistTracks.map((track) => (
+                  <li key={track.uri} className="track-start-positions__row">
+                    <span className="track-start-positions__name">
+                      {track.name}
+                      {track.artists ? ` – ${track.artists}` : ''}
+                    </span>
+                    <input
+                      type="number"
+                      min={0}
+                      value={Math.round((trackStartPositions[track.uri] ?? 0) / 1000)}
+                      onChange={(e) =>
+                        setTrackStartPositions((prev) => ({
+                          ...prev,
+                          [track.uri]: Math.max(0, Number(e.target.value)) * 1000,
+                        }))
+                      }
+                    />
+                    <span className="track-start-positions__unit">Sek.</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
 
         <label>Farbe</label>
         <div className="color-presets">
@@ -152,6 +226,7 @@ export function SituationButtonEditor({
                   mode,
                   spotifyUri: normalizedUri ?? '',
                   startPositionMs: Math.max(0, startSeconds) * 1000,
+                  trackStartPositions: mode === 'playlist' ? trackStartPositions : undefined,
                   color,
                 })
               }

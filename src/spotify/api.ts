@@ -272,27 +272,50 @@ export async function playUriAtPosition(
  * situation buttons.
  */
 export async function getPlaylistTrackUris(playlistUri: string): Promise<string[]> {
+  const tracks = await getPlaylistTracks(playlistUri);
+  return tracks.map((t) => t.uri);
+}
+
+export interface PlaylistTrackInfo {
+  uri: string;
+  name: string;
+  artists: string;
+}
+
+/**
+ * Fetches all tracks contained in a playlist (paginated, 100 per
+ * page), including display name/artists so the editor UI can show a
+ * per-track list (e.g. to configure individual start positions).
+ */
+export async function getPlaylistTracks(playlistUri: string): Promise<PlaylistTrackInfo[]> {
   const playlistId = playlistUri.split(':').pop();
   if (!playlistId) {
     throw new SpotifyApiError('Ungültige Playlist-URI.', undefined, 'UNKNOWN');
   }
 
-  const uris: string[] = [];
+  const tracks: PlaylistTrackInfo[] = [];
   // Note: the legacy `/playlists/{id}/tracks` endpoint returns 403
   // Forbidden for newer Spotify apps; `/items` is its replacement and
   // uses `item` (not `track`) as the field name for the playlist entry.
   let path: string | null =
-    `/playlists/${playlistId}/items?fields=items(item(uri)),next&limit=100`;
+    `/playlists/${playlistId}/items?fields=items(item(uri,name,artists(name))),next&limit=100`;
 
   while (path) {
     const res = await authorizedFetch(path);
     const json = await res.json();
     for (const entry of json.items ?? []) {
-      if (entry?.item?.uri) uris.push(entry.item.uri);
+      const item = entry?.item;
+      if (item?.uri) {
+        tracks.push({
+          uri: item.uri,
+          name: item.name ?? item.uri,
+          artists: (item.artists ?? []).map((a: { name: string }) => a.name).join(', '),
+        });
+      }
     }
     // `next` is a full URL from Spotify; strip the API base to reuse authorizedFetch.
     path = json.next ? (json.next as string).replace(API_BASE, '') : null;
   }
 
-  return uris;
+  return tracks;
 }
