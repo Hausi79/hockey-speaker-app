@@ -9,6 +9,8 @@ export interface SituationButtonConfig {
   /** Order of appearance in the grid. */
   order: number;
   label: string;
+  /** Optional collapsible group name, e.g. "Pre-Game" or "Game". */
+  group?: string;
   /** Hex color for the button background, for quick visual distinction. */
   color: string;
   /**

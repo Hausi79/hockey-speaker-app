@@ -32,6 +32,7 @@ export function SituationButtonEditor({
   onClose,
 }: SituationButtonEditorProps) {
   const [label, setLabel] = useState(button.label);
+  const [group, setGroup] = useState(button.group ?? '');
   const [mode, setMode] = useState<SituationButtonMode>(button.mode);
   const [spotifyInput, setSpotifyInput] = useState(button.spotifyUri);
   const [startSeconds, setStartSeconds] = useState(
@@ -50,6 +51,7 @@ export function SituationButtonEditor({
 
   useEffect(() => {
     setLabel(button.label);
+    setGroup(button.group ?? '');
     setMode(button.mode);
     setSpotifyInput(button.spotifyUri);
     setStartSeconds(Math.round(button.startPositionMs / 1000));
@@ -100,6 +102,19 @@ export function SituationButtonEditor({
           Name
           <input value={label} onChange={(e) => setLabel(e.target.value)} />
         </label>
+
+        <label>
+          Gruppe (optional)
+          <input
+            placeholder="z. B. Pre-Game oder Game"
+            value={group}
+            onChange={(e) => setGroup(e.target.value)}
+          />
+        </label>
+        <p className="modal__hint">
+          Buttons mit demselben Gruppennamen werden zusammen angezeigt und können
+          gemeinsam ein- oder ausgeblendet werden.
+        </p>
 
         <label>Typ</label>
         <div className="mode-toggle">
@@ -255,6 +270,7 @@ export function SituationButtonEditor({
                 onSave({
                   ...button,
                   label: label.trim() || button.label,
+                  group: group.trim() || undefined,
                   mode,
                   spotifyUri: normalizedUri ?? '',
                   startPositionMs: Math.max(0, startSeconds) * 1000,

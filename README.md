@@ -142,6 +142,9 @@ Repository-Namen muss dieser Pfad entsprechend angepasst werden.
    kann (unterschiedliche Songs haben ja meist unterschiedlich lange
    Intros). Ein Tap im Normalmodus startet sofort den zugeordneten
    bzw. ausgewählten Song an der (für ihn) konfigurierten Position.
+   Für viele Buttons können ausserdem optionale Gruppen wie
+   „Pre-Game“ oder „Game“ vergeben werden. Die Gruppen erscheinen als
+   auf- und zuklappbare Bereiche, damit die Anzeige übersichtlich bleibt.
 4. **Neues Spiel**: Der Button "🆕 Neues Spiel" im Header setzt den
    "bereits gespielt"-Verlauf aller Playlist-Buttons zurück, damit zu
    Beginn des nächsten Spiels wieder alle Titel zur Auswahl stehen.

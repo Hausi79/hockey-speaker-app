@@ -270,6 +270,39 @@ input {
   gap: 12px;
 }
 
+.situation-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.situation-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.situation-group__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: left;
+}
+
+.situation-group__count {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
 @media (min-width: 480px) {
   .situation-grid {
     grid-template-columns: repeat(3, 1fr);
