@@ -78,6 +78,10 @@ input {
 .app-header h1 {
   font-size: 1.45rem;
   margin: 0;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   background: linear-gradient(90deg, var(--accent), #fff 55%, var(--accent-warm));
   -webkit-background-clip: text;
   background-clip: text;
@@ -87,6 +91,18 @@ input {
 .app-header__actions {
   display: flex;
   gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn-icon {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  line-height: 1;
 }
 
 .hint {
@@ -592,6 +608,7 @@ input {
 
 .modal__actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   margin-top: 8px;
@@ -601,6 +618,23 @@ input {
 .modal__actions-right {
   display: flex;
   gap: 8px;
+}
+
+@media (max-width: 420px) {
+  .modal__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .modal__actions-right {
+    justify-content: stretch;
+  }
+
+  .modal__actions-right .btn-secondary,
+  .modal__actions-right .btn-primary,
+  .modal__actions > .btn-secondary {
+    flex: 1;
+  }
 }
 
 /* --- Banners --- */

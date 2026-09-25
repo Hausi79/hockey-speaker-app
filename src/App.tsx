@@ -204,17 +204,29 @@ export default function App() {
       <header className="app-header">
         <h1>🏒 ICEVIBES</h1>
         <div className="app-header__actions">
-          <button className="btn-secondary" onClick={handleNewGame}>
-            🆕 Neues Spiel
+          <button
+            className="btn-secondary btn-icon"
+            onClick={handleNewGame}
+            aria-label="Neues Spiel"
+            title="Neues Spiel"
+          >
+            🆕
           </button>
           <button
-            className={`btn-secondary ${editMode ? 'btn-secondary--active' : ''}`}
+            className={`btn-secondary btn-icon ${editMode ? 'btn-secondary--active' : ''}`}
             onClick={() => setEditMode((v) => !v)}
+            aria-label={editMode ? 'Bearbeiten beenden' : 'Buttons bearbeiten'}
+            title={editMode ? 'Bearbeiten beenden' : 'Buttons bearbeiten'}
           >
-            {editMode ? 'Fertig' : 'Buttons bearbeiten'}
+            {editMode ? '✅' : '⚙️'}
           </button>
-          <button className="btn-secondary" onClick={auth.logout}>
-            Logout
+          <button
+            className="btn-secondary btn-icon"
+            onClick={auth.logout}
+            aria-label="Logout"
+            title="Logout"
+          >
+            ⎋
           </button>
         </div>
       </header>
