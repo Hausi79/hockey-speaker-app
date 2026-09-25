@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
   <title id="title">Stadion-Speaker</title>
   <desc id="desc">Hockey-Puck mit grünen Schallwellen</desc>
-  <rect width="512" height="512" rx="96" fill="#0f1115"/>
+  <rect width="512" height="512" rx="96" fill="#f4f7f5"/>
   <g fill="none" stroke="#1db954" stroke-linecap="round">
     <path d="M376 176c38 42 38 118 0 160" stroke-width="24"/>
     <path d="M420 132c62 67 62 181 0 248" stroke-width="22"/>
@@ -9,10 +9,10 @@
   </g>
   <g transform="rotate(-8 190 270)">
     <ellipse cx="190" cy="304" rx="142" ry="48" fill="#050607" stroke="#1db954" stroke-width="8"/>
-    <rect x="48" y="214" width="284" height="90" rx="42" fill="#b8c3c8" stroke="#0a0d0f" stroke-width="10"/>
-    <ellipse cx="190" cy="214" rx="142" ry="48" fill="#eef3f4" stroke="#0a0d0f" stroke-width="10"/>
-    <ellipse cx="190" cy="214" rx="96" ry="29" fill="#c4cfd3"/>
-    <circle cx="190" cy="214" r="15" fill="#0a0d0f"/>
+    <rect x="48" y="214" width="284" height="90" rx="42" fill="#101417" stroke="#050607" stroke-width="10"/>
+    <ellipse cx="190" cy="214" rx="142" ry="48" fill="#252c31" stroke="#050607" stroke-width="10"/>
+    <ellipse cx="190" cy="214" rx="96" ry="29" fill="#111619"/>
+    <circle cx="190" cy="214" r="15" fill="#f4f7f5"/>
     <path d="M165 214h50M190 189v50" stroke="#1db954" stroke-width="8" stroke-linecap="round"/>
   </g>
 </svg>
