@@ -21,7 +21,7 @@ export default defineConfig(({ command }) => ({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icons/icon-192.png', 'icons/icon-512.png'],
+      includeAssets: ['icons/logo.svg', 'icons/icon-192.png', 'icons/icon-512.png'],
       manifest: {
         name: 'Stadion-Speaker',
         short_name: 'Speaker',
@@ -35,19 +35,19 @@ export default defineConfig(({ command }) => ({
         scope: '.',
         icons: [
           {
-            src: 'icons/icon-192.png',
+            src: 'icons/logo.svg',
             sizes: '192x192',
-            type: 'image/png',
+            type: 'image/svg+xml',
           },
           {
-            src: 'icons/icon-512.png',
+            src: 'icons/logo.svg',
             sizes: '512x512',
-            type: 'image/png',
+            type: 'image/svg+xml',
           },
           {
-            src: 'icons/icon-512.png',
+            src: 'icons/logo.svg',
             sizes: '512x512',
-            type: 'image/png',
+            type: 'image/svg+xml',
             purpose: 'maskable',
           },
         ],
