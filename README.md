@@ -1,7 +1,8 @@
 # Stadion-Speaker – Musiksteuerung für Hockey-Speaker (PWA)
 
-Das App-Logo kombiniert einen Hockey-Puck mit grünen Schallwellen
-(`public/icons/logo.svg`) und wird als Favicon sowie PWA-Icon verwendet.
+Das App-Logo (`public/icons/logo-cropped.png`) kombiniert einen
+Hockey-Puck mit einem Stadion-Speaker und wird als Favicon sowie
+PWA-Icon verwendet.
 
 Eine reine Client-seitige Progressive Web App zur Musiksteuerung über
 Spotify für Stadion-Speaker: grosse Situationsbuttons (Anpfiff, Tor,
