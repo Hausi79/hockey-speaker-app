@@ -23,10 +23,10 @@ export default defineConfig(({ command }) => ({
       registerType: 'autoUpdate',
       includeAssets: ['icons/icon-192.png', 'icons/icon-512.png'],
       manifest: {
-        name: 'Stadion-Speaker',
-        short_name: 'Speaker',
+        name: 'Icevibes',
+        short_name: 'Icevibes',
         description:
-          'Musiksteuerung für Hockey-Stadion-Speaker über Spotify (Situationsbuttons, Soundboard).',
+          'Musiksteuerung für Hockey-Stadion und Speaker über Spotify (Situationsbuttons, Soundboard).',
         theme_color: '#0f1115',
         background_color: '#0f1115',
         display: 'standalone',
