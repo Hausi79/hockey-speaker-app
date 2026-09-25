@@ -202,7 +202,7 @@ export default function App() {
     <div className="app-shell">
       <InstallPrompt />
       <header className="app-header">
-        <h1>🏒 Icevibes</h1>
+        <h1>🏒 ICEVIBES</h1>
         <div className="app-header__actions">
           <button className="btn-secondary" onClick={handleNewGame}>
             🆕 Neues Spiel
