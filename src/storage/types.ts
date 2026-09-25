@@ -2,6 +2,7 @@
 // only (IndexedDB) - no server, no cloud sync.
 
 export type SituationButtonMode = 'track' | 'playlist';
+export type PlaylistPlaybackOrder = 'random' | 'sequential';
 
 export interface SituationButtonConfig {
   id: string;
@@ -32,6 +33,14 @@ export interface SituationButtonConfig {
    * intro length instead of sharing a single start position.
    */
   trackStartPositions?: Record<string, number>;
+  /**
+   * Playlist mode only: 'random' (default) picks a random not-yet-
+   * played track each time; 'sequential' always plays the next track
+   * in playlist order (starting over from the top once every track
+   * has played), e.g. so "Einlaufen" doesn't always start with the
+   * same first song of the playlist while still cycling through all.
+   */
+  playlistPlaybackOrder?: PlaylistPlaybackOrder;
 }
 
 /**

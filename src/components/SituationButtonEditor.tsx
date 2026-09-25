@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react';
-import type { SituationButtonConfig, SituationButtonMode } from '../storage/types';
+import type {
+  PlaylistPlaybackOrder,
+  SituationButtonConfig,
+  SituationButtonMode,
+} from '../storage/types';
 import { getSpotifyUriType, normalizeSpotifyUri } from '../spotify/uri';
 import { getPlaylistTracks, type PlaylistTrackInfo } from '../spotify/api';
 
@@ -37,6 +41,9 @@ export function SituationButtonEditor({
   const [trackStartPositions, setTrackStartPositions] = useState<Record<string, number>>(
     button.trackStartPositions ?? {},
   );
+  const [playlistPlaybackOrder, setPlaylistPlaybackOrder] = useState<PlaylistPlaybackOrder>(
+    button.playlistPlaybackOrder ?? 'random',
+  );
   const [playlistTracks, setPlaylistTracks] = useState<PlaylistTrackInfo[]>([]);
   const [tracksLoading, setTracksLoading] = useState(false);
   const [tracksError, setTracksError] = useState<string | null>(null);
@@ -48,6 +55,7 @@ export function SituationButtonEditor({
     setStartSeconds(Math.round(button.startPositionMs / 1000));
     setColor(button.color);
     setTrackStartPositions(button.trackStartPositions ?? {});
+    setPlaylistPlaybackOrder(button.playlistPlaybackOrder ?? 'random');
   }, [button]);
 
   const normalizedUri = normalizeSpotifyUri(spotifyInput);
@@ -156,43 +164,67 @@ export function SituationButtonEditor({
             />
           </label>
         ) : (
-          <div className="track-start-positions">
-            <label>Startpunkte pro Titel (Sekunden ab Songbeginn)</label>
-            {tracksLoading && <p className="modal__hint">Lade Titel der Playlist…</p>}
-            {tracksError && <p className="modal__hint modal__hint--error">{tracksError}</p>}
-            {!tracksLoading && !tracksError && normalizedUri && playlistTracks.length === 0 && (
-              <p className="modal__hint">Die Playlist enthält keine Titel.</p>
-            )}
-            {!tracksLoading && !normalizedUri && (
-              <p className="modal__hint">
-                Erst einen Playlist-Link eingeben, um die Titel einzeln einzustellen.
-              </p>
-            )}
-            {playlistTracks.length > 0 && (
-              <ul className="track-start-positions__list">
-                {playlistTracks.map((track) => (
-                  <li key={track.uri} className="track-start-positions__row">
-                    <span className="track-start-positions__name">
-                      {track.name}
-                      {track.artists ? ` – ${track.artists}` : ''}
-                    </span>
-                    <input
-                      type="number"
-                      min={0}
-                      value={Math.round((trackStartPositions[track.uri] ?? 0) / 1000)}
-                      onChange={(e) =>
-                        setTrackStartPositions((prev) => ({
-                          ...prev,
-                          [track.uri]: Math.max(0, Number(e.target.value)) * 1000,
-                        }))
-                      }
-                    />
-                    <span className="track-start-positions__unit">Sek.</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          <>
+            <label>Abspielreihenfolge</label>
+            <div className="mode-toggle">
+              <button
+                type="button"
+                className={`mode-toggle__option ${playlistPlaybackOrder === 'random' ? 'mode-toggle__option--selected' : ''}`}
+                onClick={() => setPlaylistPlaybackOrder('random')}
+              >
+                🔀 Zufällig
+              </button>
+              <button
+                type="button"
+                className={`mode-toggle__option ${playlistPlaybackOrder === 'sequential' ? 'mode-toggle__option--selected' : ''}`}
+                onClick={() => setPlaylistPlaybackOrder('sequential')}
+              >
+                🔢 Reihenfolge
+              </button>
+            </div>
+            <p className="modal__hint">
+              {playlistPlaybackOrder === 'random'
+                ? 'Wählt bei jedem Tap zufällig einen noch nicht gespielten Titel aus.'
+                : 'Spielt die Titel immer in der Playlist-Reihenfolge ab und beginnt nach dem letzten Titel wieder von vorne.'}
+            </p>
+            <div className="track-start-positions">
+              <label>Startpunkte pro Titel (Sekunden ab Songbeginn)</label>
+              {tracksLoading && <p className="modal__hint">Lade Titel der Playlist…</p>}
+              {tracksError && <p className="modal__hint modal__hint--error">{tracksError}</p>}
+              {!tracksLoading && !tracksError && normalizedUri && playlistTracks.length === 0 && (
+                <p className="modal__hint">Die Playlist enthält keine Titel.</p>
+              )}
+              {!tracksLoading && !normalizedUri && (
+                <p className="modal__hint">
+                  Erst einen Playlist-Link eingeben, um die Titel einzeln einzustellen.
+                </p>
+              )}
+              {playlistTracks.length > 0 && (
+                <ul className="track-start-positions__list">
+                  {playlistTracks.map((track) => (
+                    <li key={track.uri} className="track-start-positions__row">
+                      <span className="track-start-positions__name">
+                        {track.name}
+                        {track.artists ? ` – ${track.artists}` : ''}
+                      </span>
+                      <input
+                        type="number"
+                        min={0}
+                        value={Math.round((trackStartPositions[track.uri] ?? 0) / 1000)}
+                        onChange={(e) =>
+                          setTrackStartPositions((prev) => ({
+                            ...prev,
+                            [track.uri]: Math.max(0, Number(e.target.value)) * 1000,
+                          }))
+                        }
+                      />
+                      <span className="track-start-positions__unit">Sek.</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </>
         )}
 
         <label>Farbe</label>
@@ -227,6 +259,7 @@ export function SituationButtonEditor({
                   spotifyUri: normalizedUri ?? '',
                   startPositionMs: Math.max(0, startSeconds) * 1000,
                   trackStartPositions: mode === 'playlist' ? trackStartPositions : undefined,
+                  playlistPlaybackOrder: mode === 'playlist' ? playlistPlaybackOrder : undefined,
                   color,
                 })
               }

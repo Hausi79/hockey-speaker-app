@@ -41,10 +41,12 @@ export default function App() {
   }, [auth.status]);
 
   /**
-   * Picks a random track from the button's playlist that hasn't been
-   * played yet this game. Once every track has been played, the
-   * history is cleared (keeping only the last played track, to avoid
-   * an immediate repeat) and playback continues from a fresh shuffle.
+   * Picks the next track from the button's playlist that hasn't been
+   * played yet this game - either randomly ('random' mode, the
+   * default) or the next one in playlist order ('sequential' mode).
+   * Once every track has been played, the history is cleared (keeping
+   * only the last played track, to avoid an immediate repeat) and
+   * playback continues from a fresh cycle.
    */
   const playRandomFromPlaylist = useCallback(
     async (button: SituationButtonConfig) => {
@@ -57,15 +59,19 @@ export default function App() {
       let candidates = allTrackUris.filter((uri) => !played.includes(uri));
 
       if (candidates.length === 0) {
-        // All tracks played: reshuffle, but avoid repeating the very
-        // last played track immediately if there are alternatives.
+        // All tracks played: start a fresh cycle, but avoid repeating
+        // the very last played track immediately if there are
+        // alternatives.
         const lastPlayed = played[played.length - 1];
         candidates = allTrackUris.filter((uri) => uri !== lastPlayed);
         if (candidates.length === 0) candidates = allTrackUris;
         await resetTrackProgress(button.id, lastPlayed ? [lastPlayed] : []);
       }
 
-      const pick = candidates[Math.floor(Math.random() * candidates.length)];
+      const pick =
+        button.playlistPlaybackOrder === 'sequential'
+          ? candidates[0]
+          : candidates[Math.floor(Math.random() * candidates.length)];
       const positionMs = button.trackStartPositions?.[pick] ?? button.startPositionMs;
       await spotify.playUriAtPosition(pick, positionMs);
       await markTrackAsPlayed(button.id, pick);
