@@ -1,13 +1,15 @@
 :root {
   color-scheme: dark;
-  --bg: #0f1115;
-  --surface: #1a1d24;
-  --surface-2: #22262f;
-  --text: #f5f5f7;
-  --text-muted: #9aa0ac;
-  --accent: #1db954;
-  --danger: #ff4d4f;
-  --radius: 14px;
+  --bg: #071426;
+  --surface: #0c1e35;
+  --surface-2: #122944;
+  --text: #f3f8ff;
+  --text-muted: #9db1c8;
+  --accent: #28d7ff;
+  --accent-warm: #ff3f67;
+  --accent-gold: #ffd95a;
+  --danger: #ff3f67;
+  --radius: 18px;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -23,7 +25,10 @@ body,
 }
 
 body {
-  background: var(--bg);
+  background:
+    radial-gradient(circle at 12% 0%, rgba(0, 199, 255, 0.18), transparent 34%),
+    radial-gradient(circle at 92% 18%, rgba(255, 40, 93, 0.14), transparent 30%),
+    var(--bg);
   color: var(--text);
   -webkit-tap-highlight-color: transparent;
 }
@@ -48,6 +53,14 @@ input {
   gap: 20px;
 }
 
+.app-shell > section,
+.now-playing,
+.playback-controls,
+.soundboard {
+  border: 1px solid rgba(91, 181, 235, 0.18);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.2);
+}
+
 .app-shell--center {
   min-height: 100vh;
   justify-content: center;
@@ -63,8 +76,12 @@ input {
 }
 
 .app-header h1 {
-  font-size: 1.4rem;
+  font-size: 1.45rem;
   margin: 0;
+  background: linear-gradient(90deg, var(--accent), #fff 55%, var(--accent-warm));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .app-header__actions {
@@ -99,13 +116,15 @@ input {
 }
 
 .btn-primary {
-  background: var(--accent);
-  color: #06210f;
+  background: linear-gradient(135deg, var(--accent), #148cff);
+  color: #03121e;
+  box-shadow: 0 0 18px rgba(40, 215, 255, 0.22);
 }
 
 .btn-secondary {
-  background: var(--surface-2);
+  background: linear-gradient(135deg, #173555, #10243d);
   color: var(--text);
+  border: 1px solid rgba(40, 215, 255, 0.25);
 }
 
 .btn-secondary--active {
@@ -128,7 +147,7 @@ input {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background: var(--surface);
+  background: linear-gradient(135deg, rgba(22, 57, 87, 0.95), rgba(12, 24, 43, 0.98));
   border-radius: var(--radius);
   padding: 14px;
 }
@@ -184,7 +203,7 @@ input {
 
 .now-playing__progress-fill {
   height: 100%;
-  background: var(--accent);
+  background: linear-gradient(90deg, var(--accent), var(--accent-warm), var(--accent-gold));
 }
 
 .now-playing__time {
@@ -195,7 +214,7 @@ input {
 
 .btn-stop {
   width: 100%;
-  background: var(--danger, #ff4d4f);
+  background: linear-gradient(100deg, #e92757, #ff6c4f);
   color: #fff;
   border: none;
   border-radius: var(--radius);
@@ -218,7 +237,7 @@ input {
 /* --- Playback controls --- */
 
 .playback-controls {
-  background: var(--surface);
+  background: linear-gradient(135deg, rgba(17, 47, 76, 0.95), rgba(10, 26, 46, 0.98));
   border-radius: var(--radius);
   padding: 14px;
   display: flex;
@@ -234,7 +253,8 @@ input {
 }
 
 .btn-control {
-  background: var(--surface-2);
+  background: linear-gradient(145deg, #1a3a5c, #0e2038);
+  border: 1px solid rgba(40, 215, 255, 0.22);
   border-radius: 50%;
   width: 56px;
   height: 56px;
@@ -247,8 +267,9 @@ input {
 .btn-control--main {
   width: 72px;
   height: 72px;
-  background: var(--accent);
-  color: #06210f;
+  background: linear-gradient(145deg, var(--accent), #168cff);
+  color: #03121e;
+  box-shadow: 0 0 24px rgba(40, 215, 255, 0.35);
   font-size: 1.8rem;
 }
 
@@ -288,9 +309,9 @@ input {
   justify-content: space-between;
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #333;
+  border: 1px solid rgba(40, 215, 255, 0.3);
   border-radius: 8px;
-  background: var(--surface);
+  background: linear-gradient(90deg, #123150, #0d2038);
   color: var(--text);
   font-size: 1rem;
   font-weight: 700;
@@ -323,7 +344,8 @@ input {
   gap: 6px;
   padding: 12px;
   text-align: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.38), inset 0 1px rgba(255, 255, 255, 0.2);
   transition: transform 0.08s ease;
 }
 
@@ -332,7 +354,8 @@ input {
 }
 
 .situation-button--active {
-  outline: 3px solid #fff;
+  outline: 3px solid var(--accent);
+  box-shadow: 0 0 24px rgba(40, 215, 255, 0.55);
 }
 
 .situation-button__label {
@@ -346,7 +369,7 @@ input {
 }
 
 .situation-button--add {
-  background: var(--surface-2);
+  background: linear-gradient(135deg, #173555, #10243d);
   color: var(--text-muted);
   border: 2px dashed #444;
 }
@@ -383,7 +406,7 @@ input {
 /* --- Soundboard --- */
 
 .soundboard {
-  background: var(--surface);
+  background: linear-gradient(135deg, rgba(17, 47, 76, 0.95), rgba(10, 26, 46, 0.98));
   border-radius: var(--radius);
   padding: 14px;
 }
@@ -413,7 +436,8 @@ input {
 
 .sound-tile__play {
   width: 100%;
-  background: var(--surface-2);
+  background: linear-gradient(135deg, #173555, #10243d);
+  border: 1px solid rgba(255, 217, 90, 0.25);
   border-radius: 10px;
   padding: 14px 10px;
   font-weight: 600;
@@ -436,7 +460,7 @@ input {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(1, 10, 24, 0.78);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -445,7 +469,9 @@ input {
 }
 
 .modal {
-  background: var(--surface);
+  background: linear-gradient(145deg, #123252, #091a2f);
+  border: 1px solid rgba(40, 215, 255, 0.28);
+  box-shadow: 0 0 45px rgba(0, 0, 0, 0.48);
   border-radius: var(--radius);
   padding: 20px;
   width: 100%;
@@ -470,8 +496,8 @@ input {
 }
 
 .modal input {
-  background: var(--surface-2);
-  border: 1px solid #333;
+  background: #091a2f;
+  border: 1px solid rgba(40, 215, 255, 0.3);
   border-radius: 8px;
   padding: 10px;
   color: var(--text);
