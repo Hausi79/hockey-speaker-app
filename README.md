@@ -1,4 +1,4 @@
-# IceVibes – Musiksteuerung für Hockey-Speaker (PWA)
+# IceVibe – Musiksteuerung für Hockey-Speaker (PWA)
 
 Das App-Logo (`public/icons/logo-cropped.png`) kombiniert einen
 Hockey-Puck mit einem Stadion-Speaker und wird als Favicon sowie

@@ -163,7 +163,7 @@ export default function App() {
     setShowConfigMenu(false);
     const json = JSON.stringify(buttons, null, 2);
     const date = new Date().toISOString().slice(0, 10);
-    const fileName = `icevibes-buttons-${date}.json`;
+    const fileName = `icevibe-buttons-${date}.json`;
 
     const picker = (window as typeof window & {
       showSaveFilePicker?: (options?: unknown) => Promise<FileSystemFileHandle>;
@@ -175,7 +175,7 @@ export default function App() {
           suggestedName: fileName,
           types: [
             {
-              description: 'IceVibes Konfiguration',
+              description: 'IceVibe Konfiguration',
               accept: { 'application/json': ['.json'] },
             },
           ],
@@ -231,7 +231,7 @@ export default function App() {
       await replaceSituationButtons(parsed as SituationButtonConfig[]);
       setButtons(await getSituationButtons());
     } catch {
-      setActionError('Import fehlgeschlagen: Datei ist keine gültige IceVibes-Konfiguration.');
+      setActionError('Import fehlgeschlagen: Datei ist keine gültige IceVibe-Konfiguration.');
     }
   }, []);
 
@@ -281,7 +281,7 @@ export default function App() {
     <div className="app-shell">
       <InstallPrompt />
       <header className="app-header">
-        <h1>🏒 IceVibes</h1>
+        <h1>🏒 IceVibe</h1>
         <div className="app-header__actions">
           <button
             className="btn-secondary btn-icon"

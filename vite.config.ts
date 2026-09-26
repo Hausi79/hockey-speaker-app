@@ -23,8 +23,8 @@ export default defineConfig(({ command }) => ({
       registerType: 'autoUpdate',
       includeAssets: ['icons/icon-192.png', 'icons/icon-512.png'],
       manifest: {
-        name: 'IceVibes',
-        short_name: 'IceVibes',
+        name: 'IceVibe',
+        short_name: 'IceVibe',
         description:
           'Musiksteuerung für Hockey-Stadion und Speaker über Spotify (Situationsbuttons, Soundboard).',
         theme_color: '#0f1115',
