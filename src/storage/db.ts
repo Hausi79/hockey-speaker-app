@@ -87,6 +87,18 @@ export async function saveSituationButtons(buttons: SituationButtonConfig[]): Pr
   await tx.done;
 }
 
+/**
+ * Replaces the entire set of situation buttons with the given list,
+ * deleting any existing ones first. Used for config import.
+ */
+export async function replaceSituationButtons(buttons: SituationButtonConfig[]): Promise<void> {
+  const db = await getDb();
+  const tx = db.transaction('situationButtons', 'readwrite');
+  await tx.store.clear();
+  await Promise.all(buttons.map((b) => tx.store.put(b)));
+  await tx.done;
+}
+
 export async function createSituationButton(
   data: Omit<SituationButtonConfig, 'id'>,
 ): Promise<SituationButtonConfig> {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSpotifyAuth } from './hooks/useSpotifyAuth';
 import { usePlaybackState } from './hooks/usePlaybackState';
 import {
@@ -6,6 +6,7 @@ import {
   getPlayedTrackUris,
   getSituationButtons,
   markTrackAsPlayed,
+  replaceSituationButtons,
   resetAllPlaylistProgress,
   resetTrackProgress,
   saveSituationButton,
@@ -33,6 +34,8 @@ export default function App() {
   const [editingButton, setEditingButton] = useState<SituationButtonConfig | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [triggeringId, setTriggeringId] = useState<string | null>(null);
+  const [showConfigMenu, setShowConfigMenu] = useState(false);
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (auth.status === 'logged-in') {
@@ -156,6 +159,82 @@ export default function App() {
     [],
   );
 
+  const handleExportConfig = useCallback(async () => {
+    setShowConfigMenu(false);
+    const json = JSON.stringify(buttons, null, 2);
+    const date = new Date().toISOString().slice(0, 10);
+    const fileName = `icevibes-buttons-${date}.json`;
+
+    const picker = (window as typeof window & {
+      showSaveFilePicker?: (options?: unknown) => Promise<FileSystemFileHandle>;
+    }).showSaveFilePicker;
+
+    if (picker) {
+      try {
+        const handle = await picker({
+          suggestedName: fileName,
+          types: [
+            {
+              description: 'IceVibes Konfiguration',
+              accept: { 'application/json': ['.json'] },
+            },
+          ],
+        });
+        const writable = await handle.createWritable();
+        await writable.write(json);
+        await writable.close();
+        return;
+      } catch (err) {
+        // User cancelled the picker - do nothing. Any other error falls
+        // back to the plain download below.
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+      }
+    }
+
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [buttons]);
+
+  const handleImportClick = useCallback(() => {
+    setShowConfigMenu(false);
+    importInputRef.current?.click();
+  }, []);
+
+  const handleImportFile = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      if (!Array.isArray(parsed)) {
+        throw new Error('Ungültiges Format');
+      }
+      const valid = parsed.every(
+        (b) => b && typeof b.id === 'string' && typeof b.label === 'string' && typeof b.mode === 'string',
+      );
+      if (!valid) {
+        throw new Error('Ungültiges Format');
+      }
+      if (
+        !window.confirm(
+          `${parsed.length} Button(s) importieren? Die bestehende Konfiguration wird überschrieben.`,
+        )
+      ) {
+        return;
+      }
+      await replaceSituationButtons(parsed as SituationButtonConfig[]);
+      setButtons(await getSituationButtons());
+    } catch {
+      setActionError('Import fehlgeschlagen: Datei ist keine gültige IceVibes-Konfiguration.');
+    }
+  }, []);
+
   const handlePlayPause = useCallback(async () => {
     if (!playbackState.playback) return;
     try {
@@ -220,6 +299,36 @@ export default function App() {
           >
             {editMode ? '✅' : '⚙️'}
           </button>
+          <div className="config-menu-wrapper">
+            <button
+              className="btn-secondary btn-icon"
+              onClick={() => setShowConfigMenu((v) => !v)}
+              aria-label="Konfiguration exportieren/importieren"
+              title="Konfiguration exportieren/importieren"
+            >
+              📁
+            </button>
+            {showConfigMenu && (
+              <>
+                <div className="config-menu__backdrop" onClick={() => setShowConfigMenu(false)} />
+                <div className="config-menu">
+                  <button className="config-menu__item" onClick={handleExportConfig}>
+                    ⬆️ Exportieren
+                  </button>
+                  <button className="config-menu__item" onClick={handleImportClick}>
+                    ⬇️ Importieren
+                  </button>
+                </div>
+              </>
+            )}
+            <input
+              ref={importInputRef}
+              type="file"
+              accept="application/json"
+              className="visually-hidden"
+              onChange={handleImportFile}
+            />
+          </div>
           <button
             className="btn-secondary btn-icon"
             onClick={auth.logout}
