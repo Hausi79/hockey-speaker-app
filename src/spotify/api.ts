@@ -181,6 +181,7 @@ export async function play(options?: {
   offsetUri?: string;
   positionMs?: number;
   deviceId?: string;
+  repeatState?: 'off' | 'context';
 }): Promise<void> {
   const deviceId = options?.deviceId ?? (await resolveTargetDeviceId());
   await transferPlaybackTo(deviceId);
@@ -196,6 +197,12 @@ export async function play(options?: {
     headers: { 'Content-Type': 'application/json' },
     body: Object.keys(body).length ? JSON.stringify(body) : undefined,
   });
+  if (options?.repeatState) {
+    await authorizedFetch(
+      `/me/player/repeat?state=${options.repeatState}&device_id=${deviceId}`,
+      { method: 'PUT' },
+    );
+  }
 }
 
 /**
@@ -260,7 +267,7 @@ export async function playUriAtPosition(
   const isTrack = uri.includes(':track:');
   if (isTrack) {
     const albumUri = await getTrackAlbumUri(uri);
-    await play({ contextUri: albumUri, offsetUri: uri, positionMs, deviceId });
+    await play({ contextUri: albumUri, offsetUri: uri, positionMs, deviceId, repeatState: 'off' });
   } else {
     await play({ contextUri: uri, positionMs, deviceId });
   }
@@ -277,7 +284,13 @@ export async function playPlaylistTrackAtPosition(
   positionMs: number,
 ): Promise<void> {
   const deviceId = await resolveTargetDeviceId();
-  await play({ contextUri: playlistUri, offsetUri: trackUri, positionMs, deviceId });
+  await play({
+    contextUri: playlistUri,
+    offsetUri: trackUri,
+    positionMs,
+    deviceId,
+    repeatState: 'context',
+  });
 }
 
 /**
