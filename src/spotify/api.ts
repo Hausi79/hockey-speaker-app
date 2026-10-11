@@ -267,6 +267,20 @@ export async function playUriAtPosition(
 }
 
 /**
+ * Starts a selected playlist track in its playlist context. This keeps
+ * Spotify's queue in the playlist instead of continuing in the track's
+ * album after the selected track finishes.
+ */
+export async function playPlaylistTrackAtPosition(
+  playlistUri: string,
+  trackUri: string,
+  positionMs: number,
+): Promise<void> {
+  const deviceId = await resolveTargetDeviceId();
+  await play({ contextUri: playlistUri, offsetUri: trackUri, positionMs, deviceId });
+}
+
+/**
  * Fetches all track URIs contained in a playlist (paginated, 100 per
  * page), used to pick a random not-yet-played track for playlist-mode
  * situation buttons.
